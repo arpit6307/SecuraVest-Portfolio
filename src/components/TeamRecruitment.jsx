@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import { db } from '../firebase';
 import { collection, addDoc, Timestamp } from 'firebase/firestore'; 
-import { Container, Row, Col, Card } from 'react-bootstrap';
+// Carousel, Card, aur Carousel controls ke imports ab hata diye gaye hain
+import { Container, Row, Col } from 'react-bootstrap';
 import { 
     FaUsers, FaUserTie, FaRocket, FaHandshake, FaSpinner, 
     FaCheckCircle, FaPaperPlane, FaEnvelope, FaPhoneVolume, FaMapMarkerAlt,
@@ -12,39 +13,11 @@ import {
 import useTeamAgents from '../hooks/useTeamAgents'; 
 import CustomLoader from './common/CustomLoader'; 
 
-// --- SUB-COMPONENT: AGENT CARD (ROYAL GLASS STYLE) ---
-const AgentCard = ({ agent }) => (
-    <Col xs={12} sm={6} lg={3} className="mb-4">
-        <div className="agent-glass-card h-100 animate-fade-up">
-            
-            {/* CIRCULAR IMAGE WRAPPER */}
-            <div className="agent-image-wrapper"> 
-                {/* Image source from DB/Hook. Using public/vite.svg as ultimate fallback. */}
-                <img src={agent.img || "/vite.svg"} alt={agent.name} className="agent-img" /> 
-                <div className="agent-overlay"></div>
-            </div>
-
-            <div className="card-content text-center p-3 flex-grow-1 d-flex flex-column justify-content-between">
-                <div>
-                    <h5 className="text-white fw-bold mb-1">{agent.name}</h5>
-                    <p className="text-gold small fw-bold mb-2">{agent.title}</p>
-                </div>
-                <div className="agent-stat-chip small mt-3">
-                    <FaChartLine className="me-2 text-gold" /> {agent.policies || 0}+ Policies
-                </div>
-            </div>
-            <div className="agent-award-tag">
-                <FaAward size={16} />
-            </div>
-        </div>
-    </Col>
-);
-
 // --- MAIN COMPONENT ---
 const TeamRecruitment = () => {
-    // --- Hook Integration ---
     const { teamAgents, loading, error } = useTeamAgents(); 
     
+    // Logic for Recruitment Form (unchanged)
     const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: 'Joining opportunity enquiry.' });
     const [status, setStatus] = useState(''); 
 
@@ -99,17 +72,47 @@ const TeamRecruitment = () => {
                     </p>
                 </div>
                 
-                {/* --- 1. TEAM SHOWCASE CARDS --- */}
+                {/* --- 1. TEAM SHOWCASE (UPDATED: Line/Scroller, No Card Form) --- */}
                 <Row className="justify-content-center g-4 mb-5 pb-4">
-                    {teamAgents.length > 0 ? (
-                        teamAgents.map(agent => <AgentCard key={agent.id} agent={agent} />)
-                    ) : (
-                        <Col xs={12}>
+                    <Col xs={12}>
+                        {teamAgents.length > 0 ? (
+                            <div className="agent-list-scroller-container">
+                                <div className="agent-list-wrapper-flex">
+                                    {teamAgents.map((agent, index) => (
+                                        <div key={agent.id} className="agent-item-no-card">
+                                            
+                                            {/* Image and Wrapper (Clean Halo) */}
+                                            <div className="agent-image-wrapper-clean mx-auto mb-3"> 
+                                                <img 
+                                                    src={agent.img || "/vite.svg"} 
+                                                    alt={agent.name} 
+                                                    className="agent-img-clean" 
+                                                    onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/120x120/002D62/DAA520?text=Agent"; }}
+                                                />
+                                                <div className="agent-award-tag-clean">
+                                                    <FaAward size={14} />
+                                                </div>
+                                            </div>
+                                            
+                                            {/* Details (Clear Show) */}
+                                            <div className="text-center position-relative">
+                                                <h5 className="text-white fw-bold mb-0">{agent.name}</h5>
+                                                <p className="text-gold small fw-bold mb-1">{agent.title}</p>
+                                                <small className="text-white-50 d-block">{agent.policies || 0}+ Policies Secured</small>
+                                            </div>
+
+                                            {/* Vertical Separator (Hiding on last element) */}
+                                            {index < teamAgents.length - 1 && <div className="vertical-divider d-none d-lg-block"></div>}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ) : (
                             <div className="text-center text-white-50 p-5 border border-gold-20 rounded-3" style={{ background: 'rgba(0,45,98,0.5)' }}>
                                 {error ? `Data Fetch Error: ${error}` : 'No agents added to the team yet. Use the Admin Dashboard to populate the list.'}
                             </div>
-                        </Col>
-                    )}
+                        )}
+                    </Col>
                 </Row>
                 
                 {/* --- 2. RECRUITMENT CONTACT FORM (Glass Panel) --- */}
@@ -163,19 +166,19 @@ const TeamRecruitment = () => {
 
             </Container>
 
-            {/* --- ROYAL GLASS STYLES --- */}
+            {/* --- ROYAL GLASS STYLES (UPDATED) --- */}
             <style>{`
                 :root {
                     --gold: #DAA520;
                     --navy: #002D62;
-                    --dark-navy-bg: #002D62; /* Matching Profile BG */
+                    --dark-navy-bg: #002D62; 
                     --glass-bg: rgba(255, 255, 255, 0.03);
                     --glass-border: rgba(255, 255, 255, 0.1);
                     --red: #dc3545;
                     --success: #28a745;
                 }
                 .royal-team-section {
-                    background-color: var(--dark-navy-bg); /* Seamless match to Agent Profile */
+                    background-color: var(--dark-navy-bg); 
                     border-top: 1px solid var(--glass-border);
                 }
                 .ls-2 { letter-spacing: 2px; }
@@ -183,7 +186,7 @@ const TeamRecruitment = () => {
                 .line-gold { width: 40px; height: 2px; background: var(--gold); display: inline-block; opacity: 0.7; }
                 .text-white-50 { color: rgba(255, 255, 255, 0.5) !important; }
 
-                /* Background FX (Consistency) */
+                /* Background FX (Unchanged) */
                 .orb { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.4; z-index: 0; }
                 .orb-team-1 { top: -20%; left: 80%; width: 500px; height: 500px; background: radial-gradient(circle, var(--navy), transparent); }
                 .orb-team-2 { bottom: -10%; left: 10%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(218, 165, 32, 0.15), transparent); }
@@ -194,70 +197,94 @@ const TeamRecruitment = () => {
                     background-size: 40px 40px; z-index: 1; opacity: 0.3; pointer-events: none;
                 }
 
-                /* --- Agent Card (Glass Style) --- */
-                .agent-glass-card {
-                    background: rgba(255, 255, 255, 0.03); /* Glass Base */
-                    border: 1px solid var(--glass-border);
-                    border-radius: 16px;
-                    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-                    overflow: hidden;
-                    backdrop-filter: blur(5px);
-                    position: relative;
-                    
-                    /* Flex setup for proper content alignment */
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center; /* Center horizontally */
-                    padding-top: 20px; /* Space for the top content */
+                /* --- NEW: LINE/SCROLLER STYLES --- */
+                .agent-list-scroller-container {
+                    overflow-x: auto; /* Mobile par scroll enable */
+                    -webkit-overflow-scrolling: touch;
+                    padding-bottom: 20px; /* Thoda space niche for scrollbar */
                 }
-                .agent-glass-card:hover {
-                    transform: translateY(-8px);
-                    border-color: var(--gold);
-                    box-shadow: 0 15px 30px rgba(0,0,0,0.5), 0 0 20px rgba(218, 165, 32, 0.2);
+                .agent-list-wrapper-flex {
+                    display: flex;
+                    justify-content: center;
+                    align-items: flex-start;
                 }
 
-                /* --- CIRCULAR IMAGE STYLES (NEW) --- */
-                .agent-image-wrapper {
-                    width: 120px; 
-                    height: 120px;
-                    border-radius: 50%; /* KEY: Make it a circle */
-                    overflow: hidden;
-                    background-color: var(--navy);
-                    border: 4px solid var(--gold); /* Gold circle border */
+                .agent-item-no-card {
+                    /* Desktop: 1/6th of the container width */
+                    flex-shrink: 0;
+                    flex-grow: 1;
+                    flex-basis: 16.666%; /* 100% / 6 members */
+                    padding: 20px 15px;
                     position: relative;
-                    margin-bottom: 15px; /* Space before text content starts */
-                    box-shadow: 0 0 15px rgba(218, 165, 32, 0.3);
+                    transition: transform 0.3s ease;
                 }
-                .agent-img {
+                .agent-item-no-card:hover {
+                    transform: translateY(-5px) scale(1.03); /* Subtle lift on hover */
+                }
+
+                /* Vertical Divider (Desktop Only) */
+                .vertical-divider {
+                    position: absolute;
+                    top: 20px;
+                    right: 0;
+                    width: 1px;
+                    height: 80%;
+                    background: linear-gradient(to bottom, transparent, rgba(218, 165, 32, 0.5), transparent);
+                    opacity: 0.5;
+                }
+
+                /* Mobile/Tablet Adjustment */
+                @media (max-width: 991px) { /* Lg breakpoint se niche */
+                    .agent-list-wrapper-flex {
+                        justify-content: flex-start; /* Start from left on mobile scroll */
+                        min-width: max-content; /* Ensure container is wide enough to scroll */
+                    }
+                    .agent-item-no-card {
+                        flex-basis: 33.33%; /* Show max 3 members partially for visible scroll */
+                        width: 150px; /* Fixed width for better scroll control */
+                        margin-right: 20px; /* Add margin instead of divider */
+                    }
+                    .agent-item-no-card:last-child {
+                        margin-right: 0;
+                    }
+                    .vertical-divider {
+                        display: none; /* Mobile par divider hatana hai */
+                    }
+                }
+                
+                /* --- CLEAN IMAGE STYLES (Updated from Card) --- */
+                .agent-image-wrapper-clean {
+                    width: 100px; 
+                    height: 100px;
+                    border-radius: 50%; 
+                    overflow: hidden;
+                    background-color: rgba(255, 255, 255, 0.05); /* Subtle dark background */
+                    border: 3px solid var(--gold); /* Gold circle border */
+                    position: relative;
+                    margin-bottom: 10px; 
+                    box-shadow: 0 0 10px rgba(218, 165, 32, 0.4);
+                }
+                .agent-img-clean {
                     width: 100%;
                     height: 100%;
                     object-fit: cover;
                     object-position: top center;
-                    /* border-radius: 50%; NO NEED if wrapper is 50% */
                     transition: transform 0.5s;
                     filter: grayscale(10%);
                 }
-                .agent-glass-card:hover .agent-img { transform: scale(1.1); filter: grayscale(0); }
-                /* ------------------------------------- */
+                .agent-item-no-card:hover .agent-img-clean { transform: scale(1.05); filter: grayscale(0); }
 
-                .agent-award-tag {
-                    position: absolute; top: 10px; right: 10px;
+                .agent-award-tag-clean {
+                    position: absolute; top: -5px; right: -5px;
                     background: var(--gold);
                     color: var(--navy);
                     padding: 5px; border-radius: 50%;
                     line-height: 1;
-                    box-shadow: 0 0 10px rgba(218, 165, 32, 0.5);
-                }
-                .agent-stat-chip {
-                    background: rgba(0,0,0,0.3);
-                    padding: 4px 10px;
-                    border-radius: 50px;
-                    display: inline-flex;
-                    align-items: center;
-                    color: rgba(255,255,255,0.7);
+                    box-shadow: 0 0 8px rgba(218, 165, 32, 0.8);
                 }
 
-                /* --- Recruitment Panel (Glass Style) --- */
+
+                /* --- Recruitment Panel Styles (Unchanged for Context) --- */
                 .recruitment-glass-panel {
                     background: #002D62;
                     backdrop-filter: blur(15px);
