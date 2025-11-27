@@ -1,0 +1,29 @@
+/* src/index.css (Add these styles) */
+
+/* Custom Color Variables (If you haven't set them yet) */
+:root {
+  --bs-primary: #002D62; /* Deep Blue / Navy */
+  --bs-warning: #FFD700; /* Gold */
+}
+
+/* Ensure the full width sections look good */
+body {
+  background-color: var(--bs-primary); /* FIX APPLIED: Changed to Deep Navy Blue for seamless dark background */
+}
+
+/* Style for the Agent Profile Image Container */
+.profile-image-container {
+  /* Use Deep Blue background inside the gold border */
+  background-color: var(--bs-primary); 
+}
+
+/* Style for the Metric Dashboard (Ensuring card shadow stands out) */
+.royal-card {
+  transition: transform 0.3s ease-in-out;
+}
+
+.royal-card:hover {
+  transform: translateY(-5px);
+  /* Optional: Add a subtle glow/shadow on hover */
+  box-shadow: 0 10px 20px rgba(255, 215, 0, 0.2) !important; 
+}

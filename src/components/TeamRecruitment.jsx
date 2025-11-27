@@ -1,0 +1,347 @@
+// src/components/TeamRecruitment.jsx
+
+import React, { useState } from 'react';
+import { db } from '../firebase';
+import { collection, addDoc, Timestamp } from 'firebase/firestore'; 
+import { Container, Row, Col, Card } from 'react-bootstrap';
+import { 
+    FaUsers, FaUserTie, FaRocket, FaHandshake, FaSpinner, 
+    FaCheckCircle, FaPaperPlane, FaEnvelope, FaPhoneVolume, FaMapMarkerAlt,
+    FaAward, FaChartLine
+} from 'react-icons/fa';
+import useTeamAgents from '../hooks/useTeamAgents'; 
+import CustomLoader from './common/CustomLoader'; 
+
+// --- SUB-COMPONENT: AGENT CARD (ROYAL GLASS STYLE) ---
+const AgentCard = ({ agent }) => (
+    <Col xs={12} sm={6} lg={3} className="mb-4">
+        <div className="agent-glass-card h-100 animate-fade-up">
+            
+            {/* CIRCULAR IMAGE WRAPPER */}
+            <div className="agent-image-wrapper"> 
+                {/* Image source from DB/Hook. Using public/vite.svg as ultimate fallback. */}
+                <img src={agent.img || "/vite.svg"} alt={agent.name} className="agent-img" /> 
+                <div className="agent-overlay"></div>
+            </div>
+
+            <div className="card-content text-center p-3 flex-grow-1 d-flex flex-column justify-content-between">
+                <div>
+                    <h5 className="text-white fw-bold mb-1">{agent.name}</h5>
+                    <p className="text-gold small fw-bold mb-2">{agent.title}</p>
+                </div>
+                <div className="agent-stat-chip small mt-3">
+                    <FaChartLine className="me-2 text-gold" /> {agent.policies || 0}+ Policies
+                </div>
+            </div>
+            <div className="agent-award-tag">
+                <FaAward size={16} />
+            </div>
+        </div>
+    </Col>
+);
+
+// --- MAIN COMPONENT ---
+const TeamRecruitment = () => {
+    // --- Hook Integration ---
+    const { teamAgents, loading, error } = useTeamAgents(); 
+    
+    const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: 'Joining opportunity enquiry.' });
+    const [status, setStatus] = useState(''); 
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setStatus('loading');
+
+        try {
+            await addDoc(collection(db, "leads"), { 
+                ...formData,
+                timestamp: Timestamp.now(),
+                status: 'New - Recruitment Enquiry' // Custom status for filtering
+            });
+            
+            setStatus('success');
+            setFormData({ name: '', email: '', phone: '', message: 'Joining opportunity enquiry.' });
+            setTimeout(() => setStatus(''), 3000);
+            
+        } catch (error) {
+            console.error("Error submitting recruitment form:", error);
+            setStatus('error');
+            setTimeout(() => setStatus(''), 3000); 
+        }
+    };
+    
+    if (loading) return <CustomLoader />;
+
+    return (
+        <section id="team-recruitment" className="royal-team-section position-relative overflow-hidden py-5">
+            
+            {/* --- BACKGROUND FX (Matching Profile Section) --- */}
+            <div className="orb orb-team-1"></div>
+            <div className="orb orb-team-2"></div>
+            <div className="grid-overlay"></div>
+
+            <Container className="position-relative z-2 py-5">
+
+                {/* --- 1. TEAM SHOWCASE HEADER --- */}
+                <div className="text-center mb-5 animate-fade-down">
+                    <div className="d-inline-flex align-items-center justify-content-center mb-2">
+                        <span className="line-gold me-3"></span>
+                        <span className="text-gold text-uppercase ls-2 small fw-bold">Mentored Success Network</span>
+                        <span className="line-gold ms-3"></span>
+                    </div>
+                    <h2 className="display-5 fw-bold text-white">Our Elite Team of Agents</h2>
+                    <p className="text-white-50 mx-auto fs-5" style={{ maxWidth: '700px' }}>
+                        The true measure of mentorship is the success of those you guide. Meet the agents thriving under Ashok Sir's guidance.
+                    </p>
+                </div>
+                
+                {/* --- 1. TEAM SHOWCASE CARDS --- */}
+                <Row className="justify-content-center g-4 mb-5 pb-4">
+                    {teamAgents.length > 0 ? (
+                        teamAgents.map(agent => <AgentCard key={agent.id} agent={agent} />)
+                    ) : (
+                        <Col xs={12}>
+                            <div className="text-center text-white-50 p-5 border border-gold-20 rounded-3" style={{ background: 'rgba(0,45,98,0.5)' }}>
+                                {error ? `Data Fetch Error: ${error}` : 'No agents added to the team yet. Use the Admin Dashboard to populate the list.'}
+                            </div>
+                        </Col>
+                    )}
+                </Row>
+                
+                {/* --- 2. RECRUITMENT CONTACT FORM (Glass Panel) --- */}
+                <div className="recruitment-glass-panel mx-auto p-4 p-md-5">
+                    <Row className="align-items-center g-4">
+                        <Col lg={5} className="text-center text-lg-start position-relative z-2">
+                            <FaHandshake size={50} className="text-gold mb-3" />
+                            <h3 className="text-white fw-bold mb-3">Become a SecuraVest Agent</h3>
+                            <p className="text-white-50 mb-4">
+                                Join our high-performing team. Receive direct training, access to exclusive resources, and a path to financial leadership.
+                            </p>
+                            <div className="d-flex flex-wrap justify-content-center justify-content-lg-start gap-2 mt-4">
+                                <span className="recruitment-chip"><FaUserTie className="me-2"/> Direct Mentorship</span>
+                                <span className="recruitment-chip"><FaRocket className="me-2"/> High Incentives</span>
+                                <span className="recruitment-chip"><FaMapMarkerAlt className="me-2"/> Flexible Work</span>
+                            </div>
+                        </Col>
+                        <Col lg={7}>
+                            <form onSubmit={handleSubmit} className="recruitment-form-bg p-3">
+                                <Row>
+                                    <Col md={6} className="mb-3">
+                                        <div className="custom-input-wrapper">
+                                            <FaUserTie className="input-icon" />
+                                            <input type="text" className="custom-input" name="name" placeholder="Full Name" value={formData.name} onChange={handleChange} required />
+                                        </div>
+                                    </Col>
+                                    <Col md={6} className="mb-3">
+                                        <div className="custom-input-wrapper">
+                                            <FaPhoneVolume className="input-icon" />
+                                            <input type="tel" className="custom-input" name="phone" placeholder="Contact Number" value={formData.phone} onChange={handleChange} required />
+                                        </div>
+                                    </Col>
+                                    <Col md={12} className="mb-4">
+                                        <div className="custom-input-wrapper">
+                                            <FaEnvelope className="input-icon" />
+                                            <textarea className="custom-input" name="email" rows="1" placeholder="Email Address / Relevant Experience" value={formData.email} onChange={handleChange} required></textarea>
+                                        </div>
+                                    </Col>
+                                </Row>
+
+                                <button type="submit" className="btn-gold-glow w-100" disabled={status === 'loading'}>
+                                    {status === 'loading' ? <span className="d-flex align-items-center justify-content-center"><FaSpinner className="fa-spin me-2" /> Submitting Request...</span> : <span className="d-flex align-items-center justify-content-center"><FaPaperPlane className="me-2" /> Apply Now</span>}
+                                </button>
+
+                                {status === 'success' && <div className="mt-3 text-success small fw-bold text-center animate-fade-in"><FaCheckCircle className="me-1"/> Application Received! We will be in touch.</div>}
+                                {status === 'error' && <div className="mt-3 text-danger small fw-bold text-center animate-fade-in">Submission Failed. Please try again or call directly.</div>}
+                            </form>
+                        </Col>
+                    </Row>
+                </div>
+
+            </Container>
+
+            {/* --- ROYAL GLASS STYLES --- */}
+            <style>{`
+                :root {
+                    --gold: #DAA520;
+                    --navy: #002D62;
+                    --dark-navy-bg: #002D62; /* Matching Profile BG */
+                    --glass-bg: rgba(255, 255, 255, 0.03);
+                    --glass-border: rgba(255, 255, 255, 0.1);
+                    --red: #dc3545;
+                    --success: #28a745;
+                }
+                .royal-team-section {
+                    background-color: var(--dark-navy-bg); /* Seamless match to Agent Profile */
+                    border-top: 1px solid var(--glass-border);
+                }
+                .ls-2 { letter-spacing: 2px; }
+                .text-gold { color: var(--gold) !important; }
+                .line-gold { width: 40px; height: 2px; background: var(--gold); display: inline-block; opacity: 0.7; }
+                .text-white-50 { color: rgba(255, 255, 255, 0.5) !important; }
+
+                /* Background FX (Consistency) */
+                .orb { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.4; z-index: 0; }
+                .orb-team-1 { top: -20%; left: 80%; width: 500px; height: 500px; background: radial-gradient(circle, var(--navy), transparent); }
+                .orb-team-2 { bottom: -10%; left: 10%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(218, 165, 32, 0.15), transparent); }
+                .grid-overlay {
+                    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+                    background-image: linear-gradient(var(--glass-bg) 1px, transparent 1px),
+                    linear-gradient(90deg, var(--glass-bg) 1px, transparent 1px);
+                    background-size: 40px 40px; z-index: 1; opacity: 0.3; pointer-events: none;
+                }
+
+                /* --- Agent Card (Glass Style) --- */
+                .agent-glass-card {
+                    background: rgba(255, 255, 255, 0.03); /* Glass Base */
+                    border: 1px solid var(--glass-border);
+                    border-radius: 16px;
+                    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                    overflow: hidden;
+                    backdrop-filter: blur(5px);
+                    position: relative;
+                    
+                    /* Flex setup for proper content alignment */
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center; /* Center horizontally */
+                    padding-top: 20px; /* Space for the top content */
+                }
+                .agent-glass-card:hover {
+                    transform: translateY(-8px);
+                    border-color: var(--gold);
+                    box-shadow: 0 15px 30px rgba(0,0,0,0.5), 0 0 20px rgba(218, 165, 32, 0.2);
+                }
+
+                /* --- CIRCULAR IMAGE STYLES (NEW) --- */
+                .agent-image-wrapper {
+                    width: 120px; 
+                    height: 120px;
+                    border-radius: 50%; /* KEY: Make it a circle */
+                    overflow: hidden;
+                    background-color: var(--navy);
+                    border: 4px solid var(--gold); /* Gold circle border */
+                    position: relative;
+                    margin-bottom: 15px; /* Space before text content starts */
+                    box-shadow: 0 0 15px rgba(218, 165, 32, 0.3);
+                }
+                .agent-img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    object-position: top center;
+                    /* border-radius: 50%; NO NEED if wrapper is 50% */
+                    transition: transform 0.5s;
+                    filter: grayscale(10%);
+                }
+                .agent-glass-card:hover .agent-img { transform: scale(1.1); filter: grayscale(0); }
+                /* ------------------------------------- */
+
+                .agent-award-tag {
+                    position: absolute; top: 10px; right: 10px;
+                    background: var(--gold);
+                    color: var(--navy);
+                    padding: 5px; border-radius: 50%;
+                    line-height: 1;
+                    box-shadow: 0 0 10px rgba(218, 165, 32, 0.5);
+                }
+                .agent-stat-chip {
+                    background: rgba(0,0,0,0.3);
+                    padding: 4px 10px;
+                    border-radius: 50px;
+                    display: inline-flex;
+                    align-items: center;
+                    color: rgba(255,255,255,0.7);
+                }
+
+                /* --- Recruitment Panel (Glass Style) --- */
+                .recruitment-glass-panel {
+                    background: #002D62;
+                    backdrop-filter: blur(15px);
+                    border: 1px solid var(--gold);
+                    border-radius: 20px;
+                    box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+                    max-width: 1100px;
+                }
+                .recruitment-chip {
+                    background: rgba(218, 165, 32, 0.15);
+                    border: 1px solid var(--gold);
+                    padding: 10px 18px;
+                    border-radius: 50px;
+                    color: var(--gold);
+                    font-size: 0.9rem;
+                    display: inline-flex;
+                    align-items: center;
+                    font-weight: 600;
+                    transition: all 0.3s;
+                }
+                .recruitment-chip:hover {
+                    background: var(--gold);
+                    color: var(--dark-navy-bg);
+                    transform: translateY(-3px);
+                    box-shadow: 0 5px 15px rgba(218, 165, 32, 0.4);
+                }
+                
+                /* Form Background & Input Styles */
+                .recruitment-form-bg {
+                    background: rgba(0,0,0,0.3);
+                    border-radius: 12px;
+                    padding: 20px;
+                }
+                .custom-input-wrapper { position: relative; }
+                .input-icon {
+                    position: absolute; top: 50%; left: 15px; transform: translateY(-50%);
+                    color: var(--gold); opacity: 0.7;
+                }
+                .custom-input {
+                    width: 100%;
+                    background: rgba(255, 255, 255, 0.05);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    border-radius: 12px;
+                    padding: 14px 14px 14px 45px;
+                    color: white;
+                    font-size: 1rem;
+                    transition: all 0.3s;
+                }
+                .custom-input:focus {
+                    outline: none;
+                    border-color: var(--gold);
+                    box-shadow: 0 0 15px rgba(218, 165, 32, 0.2);
+                    background: rgba(255, 255, 255, 0.08);
+                }
+                
+                /* Button Styles */
+                .btn-gold-glow {
+                    background: linear-gradient(135deg, var(--gold), #B8860B);
+                    color: #000; padding: 12px 30px; border-radius: 50px;
+                    font-weight: bold; text-decoration: none;
+                    box-shadow: 0 0 20px rgba(218, 165, 32, 0.3);
+                    transition: all 0.3s; display: flex; align-items: center; justify-content: center;
+                }
+                .btn-gold-glow:hover:not(:disabled) { 
+                    transform: translateY(-3px); 
+                    box-shadow: 0 0 30px rgba(218, 165, 32, 0.5); 
+                }
+                .btn-gold-glow:disabled { opacity: 0.6; cursor: not-allowed; }
+
+                .text-success { color: var(--success) !important; }
+                .text-danger { color: var(--red) !important; }
+                .fa-spin { animation: spin 1s linear infinite; }
+                @keyframes spin { 100% { transform: rotate(360deg); } }
+                @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+                .animate-fade-up { animation: fadeUp 0.8s ease-out forwards; opacity: 0; transform: translateY(20px); }
+
+                @media (max-width: 768px) {
+                    .display-5 { font-size: 2.2rem; }
+                    .agent-image-wrapper { width: 100px; height: 100px; margin-bottom: 10px; }
+                    .agent-award-tag { top: 5px; right: 5px; padding: 3px; }
+                }
+            `}</style>
+        </section>
+    );
+};
+
+export default TeamRecruitment;

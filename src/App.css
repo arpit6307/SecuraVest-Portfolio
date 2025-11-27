@@ -1,0 +1,763 @@
+/* --- CORE VARIABLES --- */
+:root {
+    --royal-primary: #002D62; /* Deep Navy Blue (Primary Backgrounds, Buttons) */
+    --royal-secondary: #004080; /* Slightly lighter navy (For cards/panels in profile) */
+    --royal-accent: #DAA520; /* Dark Gold/Golden (Accent color) */
+    --royal-text: #F8F9FA;  /* Off-White/Light Gray (Text on dark backgrounds) */
+    --shadow-subtle: rgba(0, 0, 0, 0.2);
+}
+
+
+/* ------------------------------------------------------------------ */
+/* --- GLOBAL UTILITY CLASSES & BOOTSTRAP OVERRIDES --- */
+/* ------------------------------------------------------------------ */
+
+/* Bootstrap Overrides (Ensure brand consistency) */
+.text-primary { color: var(--royal-primary) !important; }
+.btn-primary { background-color: var(--royal-primary) !important; border-color: var(--royal-primary) !important; }
+.btn-warning { background-color: var(--royal-accent) !important; border-color: var(--royal-accent) !important; color: var(--royal-primary) !important; }
+
+/* New Custom Utility Classes */
+.royal-bg-primary { background-color: var(--royal-primary) !important; }
+.royal-bg-secondary { background-color: var(--royal-secondary) !important; }
+.royal-text-accent { color: var(--royal-accent) !important; }
+.royal-text-light { color: var(--royal-text) !important; }
+
+
+/* Custom Button for Accent (Used for CTAs like 'Request a Free Consultation') */
+.btn-royal-accent {
+    background-color: var(--royal-accent) !important;
+    color: var(--royal-primary) !important;
+    border: 1px solid var(--royal-accent) !important;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.btn-royal-accent:hover {
+    background-color: #c9961f !important; /* A slightly darker gold */
+    border-color: #c9961f !important;
+    color: var(--royal-primary) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(218, 165, 32, 0.4) !important; /* Subtle gold shadow */
+}
+
+
+/* ------------------------------------------------------------------ */
+/* --- AGENT PROFILE REDESIGN STYLES (Image Fix & Padding Fix Included) --- */
+/* ------------------------------------------------------------------ */
+
+#agent-profile {
+    background-color: var(--royal-primary);
+    color: var(--royal-text);
+    overflow: hidden; 
+    /* FIX: Increased padding significantly for proper navbar clearance (Desktop) */
+    padding-top: 30rem; /* FINAL UPDATED: Max clearance to solve fixed navbar overlap */
+    padding-bottom: -45rem;
+    margin-top: -430px; /* To offset the fixed navbar height */
+}
+
+/* 1. Container for the profile image (FIXES SQUASHING/CENTERING) */
+.profile-image-container {
+    /* Use padding-top trick for a perfect 1:1 aspect ratio based on width */
+    width: 200px; /* Base size on desktop */
+    height: 0; /* Height is controlled by padding-top */
+    padding-top: 200px; /* Makes height equal to width (100% of width) */
+    position: relative; 
+    margin-left: auto; 
+    margin-right: auto; 
+    border-radius: 50%; 
+    overflow: hidden; 
+    box-shadow: 0 0 0 5px rgba(218, 165, 32, 0.5), 0 0 0 10px rgba(0, 0, 0, 0.2); 
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.profile-image-container:hover {
+    transform: scale(1.03); 
+    box-shadow: 0 0 0 5px var(--royal-accent), 0 0 0 12px rgba(0, 0, 0, 0.3);
+}
+
+
+/* 2. Style for the actual image inside the container */
+.profile-image-container .profile-image {
+    position: absolute; 
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* KEY: Crop the image to cover the container without stretching */
+    /* FIX 2 APPLIED: Adjusted vertical position to show the head/face better */
+    object-position: 50% 20%; 
+    border: none;
+    border-radius: 50%;
+    transition: transform 0.3s ease-in-out;
+}
+
+.profile-image-container .profile-image:hover {
+    transform: scale(1.05);
+}
+
+
+/* Responsive adjustments for mobile: Make image smaller on very small screens */
+@media (max-width: 575.98px) { /* Extra small devices (portrait phones, less than 576px) */
+    /* FIX: Increased mobile padding for clearance */
+    #agent-profile {
+        padding-top: 25rem; /* FINAL UPDATED: Max clearance for mobile */
+    }
+    
+    .profile-image-container {
+        width: 150px; 
+        padding-top: 150px; 
+        box-shadow: 0 0 0 4px rgba(218, 165, 32, 0.5), 0 0 0 8px rgba(0, 0, 0, 0.2); 
+    }
+}
+
+/* Value Proposition Card Styling & Milestone Card Styling (shared class) */
+.royal-card-feature, .milestone-card {
+    /* REDESIGN 1: Add subtle border, increase internal padding, and ensure center alignment */
+    border: 1px solid rgba(218, 165, 32, 0.2); /* Subtle gold line */
+    border-radius: 0.75rem; /* Smoother edges */
+    padding: 1.5rem 1rem !important; /* Increased internal padding */
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.royal-card-feature:hover, .milestone-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Badge for expertise */
+.badge.royal-bg-secondary {
+    background-color: var(--royal-secondary);
+    color: var(--royal-accent);
+    border: 1px solid var(--royal-accent);
+    transition: all 0.2s ease-in-out;
+    cursor: default; 
+    /* REDESIGN 2: Better spacing and alignment for multiple tags */
+    margin: 4px; 
+    display: inline-flex;
+    align-items: center;
+}
+.badge.royal-bg-secondary:hover {
+    background-color: var(--royal-accent);
+    color: var(--royal-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+
+/* ------------------------------------------------------------------ */
+/* --- PREVIOUS NAVBAR STYLES (Kept for continuity) --- */
+/* ------------------------------------------------------------------ */
+
+.ascension-nav {
+    background-color: var(--royal-primary) !important;
+    box-shadow: 0 4px 12px var(--shadow-subtle);
+    z-index: 1050;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+/* Branding (Crown and Text) */
+.ascension-brand {
+    transition: transform 0.3s ease;
+}
+.ascension-brand:hover {
+    transform: scale(1.05);
+}
+
+/* Navigation Link Style (Default hover for non-CTA links) */
+.ascension-link {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--royal-text) !important;
+    position: relative;
+    padding: 5px 10px;
+    margin: 0 8px;
+    transition: color 0.3s ease;
+}
+
+.ascension-link:hover {
+    color: var(--royal-accent) !important; /* Non-CTA links go Gold */
+}
+
+/* Contact Button Hover Fix */
+.ascension-nav .btn-warning {
+    color: var(--royal-primary) !important; /* Keep original dark text color */
+}
+
+.ascension-nav .btn-warning:hover {
+    color: var(--royal-text) !important; /* Overrides default hover: Text turns WHITE on hover */
+    /* Ensure the button's accent background color is maintained by the inline style in Navbar.jsx */
+}
+
+
+/* Gold Underline Animation */
+.ascension-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background: var(--royal-accent);
+    transition: width 0.3s ease-out;
+}
+
+.ascension-link:hover::after {
+    width: 100%;
+}
+
+
+/* ------------------------------------------------------------------ */
+/* --- PREVIOUS MOBILE MENU STYLES (Kept for continuity) --- */
+/* ------------------------------------------------------------------ */
+
+.mobile-ascension-menu {
+    position: fixed;
+    bottom: -100vh;
+    left: 0; 
+    width: 100%;
+    height: 100vh;
+    background: var(--royal-primary); 
+    z-index: 1200;
+    transition: bottom 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-bottom: 10vh;
+}
+
+.mobile-ascension-menu.open {
+    bottom: 0;
+}
+
+.menu-close-btn-top {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    color: var(--royal-accent);
+    cursor: pointer;
+    z-index: 1210;
+    font-size: 2.5rem;
+}
+
+.ascension-menu-links {
+    list-style: none;
+    padding: 0 30px;
+    text-align: left;
+    width: 100%;
+}
+
+/* Link Styling */
+.ascension-menu-links li {
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+}
+
+.mobile-ascension-menu.open .ascension-menu-links li {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.ascension-menu-links a {
+    color: var(--royal-text);
+    text-decoration: none;
+    font-size: 1.5rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    transition: color 0.3s ease;
+}
+
+.ascension-menu-links a:hover {
+    color: var(--royal-accent);
+}
+
+.ascension-menu-links .icon {
+    color: var(--royal-accent);
+    margin-right: 15px;
+}
+/* ------------------------------------------------------------------ */
+/* --- METRIC DASHBOARD REDESIGN STYLES (NEW PREMIUM LOOK) --- */
+/* ------------------------------------------------------------------ */
+
+.royal-metric-card {
+    background-color: var(--royal-secondary) !important; /* Darker navy background */
+    border: 3px solid var(--royal-accent) !important; /* Gold border for emphasis */
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smooth, satisfying transition */
+    cursor: default;
+}
+
+.royal-metric-card:hover {
+    /* Advanced Feature: Subtle 3D Tilt on Hover */
+    /* Gives a sophisticated 'lifted' effect */
+    transform: perspective(1000px) rotateX(1deg) rotateY(1deg) scale(1.05);
+    box-shadow: 0 15px 30px rgba(218, 165, 32, 0.4) !important; /* Stronger gold shadow */
+}
+
+/* Ensure the SVG icons are colored by the accent variable */
+.royal-metric-card svg path {
+    fill: var(--royal-accent);
+    stroke: var(--royal-accent);
+}
+
+/* Mobile Adjustments for metrics */
+@media (max-width: 575.98px) {
+    .royal-metric-card .card-body {
+        padding: 1.5rem !important; /* Slightly smaller padding on mobile */
+    }
+    .royal-metric-card h2 {
+        font-size: 2.5rem !important; /* Smaller text on tiny screens */
+    }
+}
+/* ------------------------------------------------------------------ */
+/* --- REVIEW SUBMISSION FORM STYLING (Matching Metrics Card Look) --- */
+/* ------------------------------------------------------------------ */
+.royal-review-card {
+    background-color: var(--royal-secondary) !important; /* Darker navy background */
+    border: 3px solid var(--royal-accent) !important; /* FIX APPLIED: Gold border for emphasis (now 3px) */
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smooth, satisfying transition */
+    cursor: default;
+    /* Ensure text input fields contrast well on this dark background */
+    color: var(--royal-primary); 
+}
+
+.royal-review-card:hover {
+    /* Subtle 3D Tilt on Hover (Like the Metric Cards) */
+    transform: perspective(1000px) rotateX(1deg) rotateY(1deg) scale(1.03);
+    box-shadow: 0 15px 30px rgba(218, 165, 32, 0.4) !important; /* Stronger gold shadow */
+}
+
+/* Style for text inputs and select box inside the dark card */
+.royal-review-card .form-control,
+.royal-review-card .form-select {
+    background-color: var(--royal-text); /* Light background for easy typing */
+    border: 1px solid var(--royal-accent);
+    color: var(--royal-primary);
+}
+
+/* Ensure the label text is visible */
+.royal-review-card label {
+    color: var(--royal-text) !important; 
+}
+
+/* ------------------------------------------------------------------ */
+/* --- CONTACT SECTION STYLING (NEW PREMIUM PANEL) --- */
+/* ------------------------------------------------------------------ */
+
+/* 1. New Cohesive Panel (royal-contact-info-panel) - ADVANCED DESIGN */
+.royal-contact-info-panel {
+    background-color: var(--royal-secondary) !important;
+    border: 3px solid var(--royal-accent); 
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    padding: 2.5rem !important; /* Increased internal padding for a spacious feel */
+}
+
+.royal-contact-info-panel:hover {
+    transform: translateY(-3px); /* Subtle lift */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Schedule Your Consultation Form Border Updated to Gold and Background to Secondary Navy */
+.royal-contact-form-bg {
+    background-color: var(--royal-secondary) !important; 
+    border: 3px solid var(--royal-accent); 
+}
+
+
+/* Input field styles updated to contrast with the new Secondary Navy background */
+.royal-contact-form-bg .form-control,
+.royal-contact-form-bg .form-select {
+    border: 1px solid var(--royal-accent); /* Gold border on inputs */
+    background-color: var(--royal-text); /* Off-white background for inputs */
+    color: var(--royal-primary);
+}
+
+/* ------------------------------------------------------------------ */
+/* --- NEW FOOTER STYLING (The "Golden Cap" Design) --- */
+/* ------------------------------------------------------------------ */
+
+.royal-footer {
+    /* Background set to Primary Navy to join smoothly with other sections */
+    background-color: var(--royal-primary) !important; 
+    color: var(--royal-text);
+    /* Removed box-shadow */
+    box-shadow: none; 
+    /* Add thick gold border at the top for clear separation */
+    border-top: 5px solid var(--royal-accent); 
+}
+
+/* Horizontal Separator Line (Unique Look) */
+.royal-footer-separator {
+    border: none;
+    height: 1px;
+    /* Create a gold gradient line for a premium separator effect */
+    background: linear-gradient(to right, 
+        rgba(0, 0, 0, 0), 
+        var(--royal-accent), 
+        var(--royal-accent), 
+        var(--royal-accent), 
+        rgba(0, 0, 0, 0)
+    ); /* Thicker, more pronounced gradient */
+    opacity: 0.9;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* ------------------------------------------------ */
+/* --- THE UNIQUE DEVELOPER SIGNATURE / SEAL --- */
+/* ------------------------------------------------ */
+
+/* Keyframes for the Subtle Gold Pulse Effect */
+@keyframes goldPulse {
+    0% { text-shadow: 0 0 5px rgba(218, 165, 32, 0.5), 0 0 0 rgba(218, 165, 32, 0.8); }
+    50% { text-shadow: 0 0 10px var(--royal-accent), 0 0 20px rgba(255, 255, 255, 0.2); }
+    100% { text-shadow: 0 0 5px rgba(218, 165, 32, 0.5), 0 0 0 rgba(218, 165, 32, 0.8); }
+}
+
+/* Developer Credit Styling - Making it a SHINING SIGNATURE */
+.royal-developer-credit {
+    font-size: 1.1rem;
+    color: var(--royal-accent);
+    transition: transform 0.3s ease;
+}
+
+.developer-signature {
+    font-weight: 900; /* Extra bold */
+    letter-spacing: 1px;
+    color: white; /* Name itself is white */
+    
+    /* The unique pulsing glow effect */
+    animation: goldPulse 3s infinite ease-in-out; 
+    text-shadow: 0 0 5px var(--royal-accent); 
+    display: inline-block;
+}
+
+.developer-signature:hover {
+    animation: none; /* Pause animation on hover */
+    color: var(--royal-accent);
+    text-shadow: 0 0 15px white; /* Stronger highlight on hover */
+}
+
+.royal-developer-credit:hover {
+    transform: scale(1.05);
+}
+
+/* Social media icons */
+.royal-social-link {
+    color: var(--royal-accent) !important;
+    font-size: 1.8rem;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+.royal-social-link:hover {
+    color: var(--royal-text) !important;
+    transform: scale(1.1);
+}
+
+
+/* ------------------------------------------------------------------ */
+/* --- ADMIN LOGIN/DASHBOARD REDESIGN STYLING (NEW BLOCK) --- */
+/* ------------------------------------------------------------------ */
+
+/* --- Admin Login Card (Shared) --- */
+.royal-admin-card {
+    background-color: var(--royal-text) !important; 
+    border: 3px solid var(--royal-accent) !important; 
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    transition: transform 0.3s ease-in-out;
+}
+
+.royal-admin-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* FIX: Input Group Styling (Removes white lines/borders) */
+.royal-admin-card .input-group {
+    border: 1px solid var(--royal-accent) !important; 
+    border-radius: 0.25rem;
+    overflow: hidden; 
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.royal-admin-card .form-control,
+.royal-admin-card .input-group-text,
+.royal-admin-card .btn-outline-secondary {
+    border: none !important; 
+    border-radius: 0 !important; 
+    z-index: 10; 
+}
+
+/* Colors and Focus */
+.royal-admin-card .input-group-text {
+    background-color: var(--royal-secondary) !important;
+    color: var(--royal-accent) !important;
+}
+.royal-admin-card .input-group:focus-within {
+    box-shadow: 0 0 0 0.25rem rgba(218, 165, 32, 0.5) !important; 
+    border-color: var(--royal-accent) !important; 
+}
+.royal-admin-card .form-control:focus,
+.royal-admin-card .form-select:focus,
+.royal-admin-card .btn:focus:not(.btn-royal-accent) { 
+    box-shadow: none !important; 
+    border-color: transparent !important;
+    outline: none !important;
+}
+
+/* Style the password eye button */
+.royal-admin-card .btn-outline-secondary {
+    color: var(--royal-primary) !important;
+    background-color: var(--royal-accent);
+}
+.royal-admin-card .btn-outline-secondary:hover {
+    background-color: #c9961f !important;
+    color: var(--royal-text) !important;
+}
+.royal-admin-card .btn-outline-secondary:focus {
+    box-shadow: none !important;
+}
+
+
+/* --- Admin Dashboard Specific Styles --- */
+
+/* ---------------------------------------------------- */
+/* FIX: Sign Out Button Hover Color (User Request) */
+/* ---------------------------------------------------- */
+.admin-dashboard-header-main .btn-outline-warning {
+    color: var(--royal-accent) !important; /* Normal state text is yellow/gold */
+    border-color: var(--royal-accent) !important;
+}
+.admin-dashboard-header-main .btn-outline-warning:hover {
+    color: var(--royal-text) !important; /* FIX APPLIED: Text becomes white on hover */
+    background-color: var(--royal-accent) !important; /* Background becomes gold on hover */
+    border-color: var(--royal-accent) !important;
+}
+
+
+/* 1. Summary Cards (Advanced Design) */
+.admin-summary-card {
+    background-color: var(--royal-secondary) !important;
+    color: var(--royal-text) !important;
+    transition: all 0.3s ease;
+    border-radius: 0.5rem;
+    cursor: default;
+    /* Custom inner background for the card body */
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0));
+}
+.admin-summary-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6) !important;
+}
+/* Ensure the icon color works within the card */
+.admin-summary-card svg {
+    opacity: 0.7;
+}
+.admin-summary-card .card-footer {
+    border-top: 1px solid rgba(218, 165, 32, 0.3);
+}
+
+/* Feature 3: Goal Progress Bar */
+.admin-goal-progress {
+    height: 1.25rem;
+    background-color: #001f40; /* Dark background for progress bar */
+}
+
+/* 2. Custom Tabs (Advanced Feature) */
+.admin-nav-tabs .admin-tab-button {
+    color: var(--royal-accent);
+    background-color: transparent;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    border-radius: 0.25rem;
+}
+.admin-nav-tabs .admin-tab-button:hover {
+    background-color: rgba(218, 165, 32, 0.1);
+    color: var(--royal-accent);
+    border-bottom: 2px solid var(--royal-accent);
+}
+.admin-nav-tabs .admin-tab-button.active {
+    background-color: var(--royal-accent) !important;
+    color: var(--royal-primary) !important;
+    border-color: var(--royal-accent) !important;
+    box-shadow: 0 4px 10px rgba(218, 165, 32, 0.4);
+}
+
+/* 3. Custom Card/Panel Styling */
+.admin-data-card {
+    background-color: var(--royal-secondary) !important;
+    border: 1px solid var(--royal-accent) !important;
+    border-radius: 0.5rem;
+    overflow: hidden; 
+}
+.royal-dashboard-header {
+    background-color: var(--royal-secondary) !important;
+    color: var(--royal-text) !important;
+    font-weight: bold;
+    border-bottom: 2px solid var(--royal-accent) !important;
+    padding: 1rem 1.5rem;
+}
+
+/* 4. Metrics/Profile Input Fields */
+.admin-input {
+    background-color: var(--royal-secondary) !important;
+    border: 1px solid var(--royal-accent) !important;
+    color: var(--royal-text) !important;
+}
+.admin-input:focus {
+    background-color: var(--royal-secondary) !important;
+    color: var(--royal-text) !important;
+    box-shadow: 0 0 0 0.25rem rgba(218, 165, 32, 0.5) !important; 
+}
+/* Feature 4: Sentiment Tag Select */
+.admin-sentiment-select {
+    background-color: var(--royal-secondary) !important;
+    border-color: var(--royal-accent) !important;
+    color: var(--royal-text) !important;
+    cursor: pointer;
+}
+.admin-sentiment-select option {
+    background-color: var(--royal-secondary);
+}
+/* Feature 4: Sentiment Summary Visualization */
+.sentiment-summary-item {
+    transition: transform 0.3s ease;
+}
+.sentiment-summary-item:hover {
+     transform: scale(1.05);
+     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+
+/* 5. Table Styling (Leads & Reviews) */
+.admin-table {
+    --bs-table-bg: var(--royal-secondary);
+    --bs-table-striped-bg: #00458a;
+    --bs-table-hover-bg: #005099;
+    color: var(--royal-text);
+}
+.admin-table th, .admin-table td {
+    border-top: 1px solid rgba(218, 165, 32, 0.3); 
+    vertical-align: middle;
+}
+.admin-table th {
+    color: var(--royal-accent);
+    border-bottom: 2px solid var(--royal-accent);
+}
+
+/* Highlight for Pending Reviews/New Leads (High Urgency) */
+.pending-review-row {
+    background-color: #331f00 !important; /* Darker, golden background for urgency */
+    color: var(--royal-text);
+}
+.pending-review-row:hover {
+    background-color: #442a00 !important;
+}
+.lead-timer-cell {
+    color: #ff5757; /* Bright red for high urgency timer */
+}
+
+
+/* 6. Custom Status Badges (Lead Management) */
+.status-badge-new {
+    background-color: var(--royal-accent) !important;
+    color: var(--royal-primary) !important;
+    box-shadow: 0 1px 3px rgba(218, 165, 32, 0.5);
+}
+.status-badge-contacted {
+    background-color: #17a2b8 !important; /* Info Blue */
+    color: white !important;
+}
+.status-badge-converted {
+    background-color: #28a745 !important; /* Success Green */
+    color: white !important;
+}
+.status-badge-lost {
+    background-color: #dc3545 !important; /* Danger Red */
+    color: white !important;
+}
+
+/* Ensure the success (green) button for WhatsApp matches the theme */
+.btn-success {
+    background-color: #28a745 !important;
+    border-color: #28a745 !important;
+}
+.btn-success:hover {
+    background-color: #1e7e34 !important;
+    border-color: #1c7430 !important;
+}
+.btn-info {
+    background-color: #17a2b8 !important;
+    border-color: #17a2b8 !important;
+    color: white !important;
+}
+.btn-info:hover {
+    background-color: #117a8b !important;
+    border-color: #117a8b !important;
+    color: white !important;
+}
+
+
+/* ---------------------------------------------------- */
+/* --- CUSTOM LOADER STYLES (SHIELD ASCENT) --- */
+/* ---------------------------------------------------- */
+
+.custom-loader-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    /* Ensure the background matches primary color */
+    background-color: var(--royal-primary);
+}
+
+.shield-loader {
+    animation: shieldAscent 2.5s ease-in-out infinite alternate;
+}
+
+.shield-loader svg {
+    /* Apply a dynamic glow to the shield icon */
+    filter: drop-shadow(0 0 5px var(--royal-accent)) drop-shadow(0 0 10px rgba(218, 165, 32, 0.5));
+}
+
+.loading-text {
+    margin-top: 30px;
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    opacity: 0.8;
+    animation: textFade 2.5s ease-in-out infinite alternate;
+}
+
+/* Keyframes for the unique ascent animation */
+@keyframes shieldAscent {
+    0% {
+        transform: translateY(50px) scale(0.9);
+        opacity: 0.5;
+    }
+    100% {
+        transform: translateY(-50px) scale(1.1);
+        opacity: 1;
+    }
+}
+
+/* Keyframes for text fade synchronization */
+@keyframes textFade {
+    0% {
+        opacity: 0.6;
+    }
+    100% {
+        opacity: 1;
+    }
+}
