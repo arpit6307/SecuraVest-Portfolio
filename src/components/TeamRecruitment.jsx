@@ -350,7 +350,6 @@ const TeamRecruitment = () => {
                     }
                     .agent-item-no-card {
                         /* CRITICAL FIX: Set width to almost 100% of the view for a 1:1 scroll per item */
-                        flex-basis: calc(100% - 20px); 
                         width: calc(100% - 20px); 
                         padding: 20px 10px; /* 10px spacing on left/right for separation */
                         margin-right: 0;
