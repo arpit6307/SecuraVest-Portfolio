@@ -472,7 +472,8 @@ const TeamRecruitment = () => {
                 .animate-fade-up { animation: fadeUp 0.8s ease-out forwards; opacity: 0; transform: translateY(20px); }
 
                 @media (max-width: 768px) {
-                    .display-5 { font-size: 2.2rem; }
+                    .display-5 { font-size: 2rem; }
+                    .h5, h5 { font-size: 1.8rem; }  
                     .agent-image-wrapper { width: 100px; height: 100px; margin-bottom: 10px; }
                     .agent-award-tag { top: 5px; right: 5px; padding: 3px; }
                 }
