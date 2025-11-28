@@ -1,6 +1,6 @@
 // src/components/TeamRecruitment.jsx
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { db } from '../firebase';
 import { collection, addDoc, Timestamp } from 'firebase/firestore'; 
 // Carousel, Card, aur Carousel controls ke imports ab hata diye gaye hain
@@ -8,7 +8,7 @@ import { Container, Row, Col } from 'react-bootstrap';
 import { 
     FaUsers, FaUserTie, FaRocket, FaHandshake, FaSpinner, 
     FaCheckCircle, FaPaperPlane, FaEnvelope, FaPhoneVolume, FaMapMarkerAlt,
-    FaAward, FaChartLine
+    FaAward, FaChartLine, FaChevronLeft, FaChevronRight // Chevron icons added
 } from 'react-icons/fa';
 import useTeamAgents from '../hooks/useTeamAgents'; 
 import CustomLoader from './common/CustomLoader'; 
@@ -17,6 +17,10 @@ import CustomLoader from './common/CustomLoader';
 const TeamRecruitment = () => {
     const { teamAgents, loading, error } = useTeamAgents(); 
     
+    // --- NEW STATE & REF FOR CAROUSEL ---
+    const [activeIndex, setActiveIndex] = useState(0);
+    const scrollContainerRef = useRef(null);
+
     // Logic for Recruitment Form (unchanged)
     const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: 'Joining opportunity enquiry.' });
     const [status, setStatus] = useState(''); 
@@ -47,6 +51,38 @@ const TeamRecruitment = () => {
         }
     };
     
+    // --- CAROUSEL NAVIGATION LOGIC ---
+    const nextAgent = () => {
+        setActiveIndex((prevIndex) => (prevIndex + 1) % teamAgents.length);
+    };
+    const prevAgent = () => {
+        setActiveIndex((prevIndex) => (prevIndex - 1 + teamAgents.length) % teamAgents.length);
+    };
+
+    // --- EFFECT FOR AUTO-SLIDE AND MANUAL SCROLLING ---
+    useEffect(() => {
+        let interval;
+        if (teamAgents.length > 0 && scrollContainerRef.current) {
+            // 1. Auto-Slide Interval (FIXED: Increased speed to 6 seconds)
+            interval = setInterval(nextAgent, 6000); 
+
+            // 2. Scroll to Active Index
+            const container = scrollContainerRef.current;
+            const agentItem = container.querySelector('.agent-item-no-card');
+            
+            const agentWidth = agentItem ? agentItem.offsetWidth : 0;
+
+            container.scroll({
+                left: activeIndex * agentWidth,
+                behavior: 'smooth'
+            });
+        }
+        
+        return () => {
+            if (interval) clearInterval(interval);
+        };
+    }, [teamAgents, activeIndex]); 
+    
     if (loading) return <CustomLoader />;
 
     return (
@@ -76,36 +112,54 @@ const TeamRecruitment = () => {
                 <Row className="justify-content-center g-4 mb-5 pb-4">
                     <Col xs={12}>
                         {teamAgents.length > 0 ? (
-                            <div className="agent-list-scroller-container">
-                                <div className="agent-list-wrapper-flex">
-                                    {teamAgents.map((agent, index) => (
-                                        <div key={agent.id} className="agent-item-no-card">
-                                            
-                                            {/* Image and Wrapper (Clean Halo) */}
-                                            <div className="agent-image-wrapper-clean mx-auto mb-3"> 
-                                                <img 
-                                                    src={agent.img || "/vite.svg"} 
-                                                    alt={agent.name} 
-                                                    className="agent-img-clean" 
-                                                    onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/120x120/002D62/DAA520?text=Agent"; }}
-                                                />
-                                                <div className="agent-award-tag-clean">
-                                                    <FaAward size={14} />
-                                                </div>
-                                            </div>
-                                            
-                                            {/* Details (Clear Show) */}
-                                            <div className="text-center position-relative">
-                                                <h5 className="text-white fw-bold mb-0">{agent.name}</h5>
-                                                <p className="text-gold small fw-bold mb-1">{agent.title}</p>
-                                                <small className="text-white-50 d-block">{agent.policies || 0}+ Policies Secured</small>
-                                            </div>
+                            <div className="team-carousel-wrapper position-relative">
+                                
+                                {/* Navigation Buttons (Mobile Only) */}
+                                <button className="carousel-nav-btn prev d-lg-none" onClick={prevAgent} aria-label="Previous Agent">
+                                    <FaChevronLeft />
+                                </button>
 
-                                            {/* Vertical Separator (Hiding on last element) */}
-                                            {index < teamAgents.length - 1 && <div className="vertical-divider d-none d-lg-block"></div>}
-                                        </div>
-                                    ))}
+                                <div className="agent-list-scroller-container" ref={scrollContainerRef}>
+                                    <div className="agent-list-wrapper-flex">
+                                        {teamAgents.map((agent, index) => (
+                                            <div 
+                                                key={agent.id} 
+                                                className="agent-item-no-card"
+                                                // FIXED: Removed conditional opacity for clear display on mobile
+                                                style={{ opacity: 1 }}
+                                            >
+                                                
+                                                {/* Image and Wrapper (Clean Halo) */}
+                                                <div className="agent-image-wrapper-clean mx-auto mb-3"> 
+                                                    <img 
+                                                        src={agent.img || "/vite.svg"} 
+                                                        alt={agent.name} 
+                                                        className="agent-img-clean" 
+                                                        onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/120x120/002D62/DAA520?text=Agent"; }}
+                                                    />
+                                                    <div className="agent-award-tag-clean">
+                                                        <FaAward size={14} />
+                                                    </div>
+                                                </div>
+                                                
+                                                {/* Details (Clear Show) */}
+                                                <div className="text-center position-relative">
+                                                    <h5 className="text-white fw-bold mb-0">{agent.name}</h5>
+                                                    <p className="text-gold small fw-bold mb-1">{agent.title}</p>
+                                                    <small className="text-white-50 d-block">{agent.policies || 0}+ Policies Secured</small>
+                                                </div>
+
+                                                {/* Vertical Separator (Hiding on last element) */}
+                                                {index < teamAgents.length - 1 && <div className="vertical-divider d-none d-lg-block"></div>}
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
+                                
+                                <button className="carousel-nav-btn next d-lg-none" onClick={nextAgent} aria-label="Next Agent">
+                                    <FaChevronRight />
+                                </button>
+                                
                             </div>
                         ) : (
                             <div className="text-center text-white-50 p-5 border border-gold-20 rounded-3" style={{ background: 'rgba(0,45,98,0.5)' }}>
@@ -166,7 +220,7 @@ const TeamRecruitment = () => {
 
             </Container>
 
-            {/* --- ROYAL GLASS STYLES (UPDATED) --- */}
+            {/* --- ROYAL GLASS STYLES (UPDATED for Carousel Features and Scrollbar Fix) --- */}
             <style>{`
                 :root {
                     --gold: #DAA520;
@@ -197,16 +251,39 @@ const TeamRecruitment = () => {
                     background-size: 40px 40px; z-index: 1; opacity: 0.3; pointer-events: none;
                 }
 
-                /* --- NEW: LINE/SCROLLER STYLES --- */
-                .agent-list-scroller-container {
-                    overflow-x: auto; /* Mobile par scroll enable */
-                    -webkit-overflow-scrolling: touch;
-                    padding-bottom: 20px; /* Thoda space niche for scrollbar */
+                /* --- NEW: CAROUSEL/SCROLLER STYLES --- */
+                
+                .team-carousel-wrapper {
+                    /* Wrapper for buttons position relative */
+                    padding: 0 40px; /* Space for buttons on mobile */
                 }
+                
+                .agent-list-scroller-container {
+                    overflow-x: scroll; /* Scroll enable */
+                    -webkit-overflow-scrolling: touch;
+                    padding-bottom: 20px; 
+                    
+                    /* NEW: Hide Scrollbar on Desktop */
+                    /* Firefox */
+                    @media (min-width: 992px) {
+                        scrollbar-width: none; 
+                        -ms-overflow-style: none;  /* IE and Edge */
+                        overflow-x: hidden; /* Desktop par scroll disable */
+                    }
+                }
+                
+                /* Chrome, Safari, Opera (General Scrollbar Hide) */
+                .agent-list-scroller-container::-webkit-scrollbar {
+                    display: none; 
+                }
+                
                 .agent-list-wrapper-flex {
                     display: flex;
                     justify-content: center;
                     align-items: flex-start;
+                    width: 100%; 
+                    scroll-snap-type: none; 
+                    margin-left: -10px; /* CRITICAL FIX: Counteract padding on agent items */
                 }
 
                 .agent-item-no-card {
@@ -216,11 +293,35 @@ const TeamRecruitment = () => {
                     flex-basis: 16.666%; /* 100% / 6 members */
                     padding: 20px 15px;
                     position: relative;
-                    transition: transform 0.3s ease;
+                    /* Transition needed for smooth scroll/opacity */
+                    transition: transform 0.3s ease, opacity 0.5s ease;
                 }
                 .agent-item-no-card:hover {
                     transform: translateY(-5px) scale(1.03); /* Subtle lift on hover */
                 }
+                
+                /* --- NAVIGATION BUTTONS (Mobile Only) --- */
+                .carousel-nav-btn {
+                    position: absolute;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    z-index: 10;
+                    width: 40px; height: 40px;
+                    background: var(--gold);
+                    color: #000;
+                    border: none;
+                    border-radius: 50%;
+                    box-shadow: 0 0 10px rgba(218, 165, 32, 0.5);
+                    transition: all 0.3s;
+                    display: flex; align-items: center; justify-content: center;
+                }
+                .carousel-nav-btn:hover {
+                    transform: translateY(-50%) scale(1.1);
+                    background: #FFD700;
+                }
+                .carousel-nav-btn.prev { left: 0; }
+                .carousel-nav-btn.next { right: 0; }
+
 
                 /* Vertical Divider (Desktop Only) */
                 .vertical-divider {
@@ -233,26 +334,36 @@ const TeamRecruitment = () => {
                     opacity: 0.5;
                 }
 
-                /* Mobile/Tablet Adjustment */
+                /* Mobile/Tablet Adjustment (FIXED: 100% width for perfect slide and visibility) */
                 @media (max-width: 991px) { /* Lg breakpoint se niche */
+                    .team-carousel-wrapper {
+                        padding: 0 50px; /* Increased space for bigger buttons */
+                    }
+                    .agent-list-scroller-container {
+                        padding-left: 0;
+                        padding-right: 0;
+                    }
                     .agent-list-wrapper-flex {
-                        justify-content: flex-start; /* Start from left on mobile scroll */
-                        min-width: max-content; /* Ensure container is wide enough to scroll */
+                        justify-content: flex-start; /* Start from left */
+                        min-width: max-content; /* Critical for horizontal layout */
+                        margin-left: -10px; /* Counteract padding from agent-item */
                     }
                     .agent-item-no-card {
-                        flex-basis: 33.33%; /* Show max 3 members partially for visible scroll */
-                        width: 150px; /* Fixed width for better scroll control */
-                        margin-right: 20px; /* Add margin instead of divider */
-                    }
-                    .agent-item-no-card:last-child {
+                        /* CRITICAL FIX: Set width to almost 100% of the view for a 1:1 scroll per item */
+                        flex-basis: calc(100% - 20px); 
+                        width: calc(100% - 20px); 
+                        padding: 20px 10px; /* 10px spacing on left/right for separation */
                         margin-right: 0;
                     }
+                    .agent-item-no-card:last-child {
+                        padding-right: 10px;
+                    }
                     .vertical-divider {
-                        display: none; /* Mobile par divider hatana hai */
+                        display: none; 
                     }
                 }
                 
-                /* --- CLEAN IMAGE STYLES (Updated from Card) --- */
+                /* --- CLEAN IMAGE STYLES (Unchanged) --- */
                 .agent-image-wrapper-clean {
                     width: 100px; 
                     height: 100px;
